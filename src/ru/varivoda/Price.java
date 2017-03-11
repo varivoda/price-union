@@ -15,6 +15,59 @@ public class Price {
     private Date end;
     private long value;
 
+
+    public Price(Price price) {
+        this.id = price.getId();
+        this.productCode = price.getProductCode();
+        this.number = price.getNumber();
+        this.depart = price.getDepart();
+        this.begin = price.getBegin();
+        this.end = price.getEnd();
+        this.value = price.getValue();
+    }
+
+    public Price() {
+    }
+
+    public Price(long id, String productCode, int number, int depart, Date begin, Date end, long value) {
+        this.id = id;
+        this.productCode = productCode;
+        this.number = number;
+        this.depart = depart;
+        this.begin = begin;
+        this.end = end;
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "\nPrice" +
+                "\nid=" + id +
+                "\nproductCode='" + productCode + '\'' +
+                "\nnumber=" + number +
+                "\ndepart=" + depart +
+                "\nbegin=" + begin +
+                "\nend=" + end +
+                "\nvalue=" + value +
+                '\n';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Price price = (Price) o;
+
+        if (id != price.id) return false;
+        if (number != price.number) return false;
+        if (depart != price.depart) return false;
+        if (value != price.value) return false;
+        if (productCode != null ? !productCode.equals(price.productCode) : price.productCode != null) return false;
+        if (begin != null ? !begin.equals(price.begin) : price.begin != null) return false;
+        return end != null ? end.equals(price.end) : price.end == null;
+    }
+
     public Index getIndex() {
         return new Index();
     }
