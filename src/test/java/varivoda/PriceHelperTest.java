@@ -22,11 +22,6 @@ public class PriceHelperTest {
     private List<Price> newPrices = new LinkedList<>();
     private DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-    @Before
-    public void setUp() throws Exception {
-
-    }
-
     @Test
     public void whenCollectionsContainsPricesWithSameValueAndIndexesAndCrossingDateIntervalThenReturnedOnePriceWithUnionInterval() throws ParseException {
 
@@ -37,15 +32,8 @@ public class PriceHelperTest {
 
         Assert.assertThat(resultPrices.size(), Is.is(1));
 
-        Price price = resultPrices.iterator().next();
-
-        Assert.assertThat(price.getNumber(), CoreMatchers.is(1));
-        Assert.assertThat(price.getDepart(), CoreMatchers.is(1));
-        Assert.assertThat(price.getValue(), CoreMatchers.is(11000L));
-        Assert.assertThat(price.getProductCode(), CoreMatchers.is("122856"));
-        Assert.assertThat(price.getBegin(), CoreMatchers.is(formatter.parse("01.01.2013 00:00:00")));
-        Assert.assertThat(price.getEnd(), CoreMatchers.is(formatter.parse("20.02.2013 23:59:59")));
-
+        Price expectedPrice = new Price(100, "122856", 1, 1, formatter.parse("01.01.2013 00:00:00"), formatter.parse("20.02.2013 23:59:59"), 11000);
+        assertThatCollectionContainsPrice(resultPrices, expectedPrice);
     }
 
     @Test
@@ -132,25 +120,6 @@ public class PriceHelperTest {
 
     }
 
-//    @Test
-//    public void whenNewTwoPricesWhichDateIntervalCrosseCurPriceDateIntervalAndvaluesIsNotEqualsAndIndexesIsEqualsThenNewPriceSeparateCurrentOnTwooIntervalsWithTheirValues() throws ParseException {
-//        Price curPrice = new Price(1, "122856", 1, 1, formatter.parse("01.01.2013 00:00:00"), formatter.parse("31.01.2013 23:59:59"), 11000);
-//        curPrices.add(curPrice);
-//
-//        Price newPrice = new Price(2, "122856", 1, 1, formatter.parse("10.01.2013 00:00:00"), formatter.parse("20.02.2013 23:59:59"), 11001);
-//        newPrices.add(newPrice);
-//
-//        Collection<Price> resultPrices = PriceHelper.unionPrices(curPrices, newPrices);
-//
-//        Assert.assertThat(resultPrices.size(), Is.is(2));
-//
-//        curPrice.setEnd(formatter.parse("10.01.2013 00:00:00"));
-//
-//        assertThatCollectionContainsPrice(resultPrices, curPrice);
-//        assertThatCollectionContainsPrice(resultPrices, newPrice);
-//
-//    }
-
     /**
      * Проверяет содержится ли цена в коллекции без учета id.
      */
@@ -169,11 +138,5 @@ public class PriceHelperTest {
         }
         throw new AssertionError(String.format("Цена %s не найдена в коллекции %s", price, prices));
     }
-
-    @After
-    public void tearDown() throws Exception {
-
-    }
-
 
 }
