@@ -1,7 +1,6 @@
-package ru.varivoda;
+package varivoda;
 
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.core.AllOf;
 import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Assert;
@@ -15,14 +14,12 @@ import java.util.*;
 
 
 /**
- * Created by ivan on 11.03.17.
+ * Некоторые тесты для проверки алгоритма объединения
  */
-
 public class PriceHelperTest {
 
     private List<Price> curPrices = new LinkedList<>();
     private List<Price> newPrices = new LinkedList<>();
-    private Price price;
     private DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     @Before

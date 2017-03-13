@@ -1,10 +1,7 @@
-package ru.varivoda;
+package varivoda;
 
 import java.util.Date;
 
-/**
- * Created by ivan on 09.03.17.
- */
 public class Price {
 
     private long id;
@@ -129,6 +126,9 @@ public class Price {
     }
 
 
+    /**
+     * Класс определяет уникаьный идетнификатор цены
+     */
     public class Index {
 
         public String getProductCode() {

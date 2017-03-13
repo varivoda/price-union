@@ -1,40 +1,45 @@
-package ru.varivoda;
+package varivoda;
 
 import java.util.*;
 
 /**
- * Created by ivan on 09.03.17.
+ * Статический хелпер для обращения с ценами
  */
 public class PriceHelper {
 
-    public static Collection<Price> unionPrices(Collection<Price> curPrices, Collection<Price> newPrices) {
 
-        // Мапируем по соответсвию : productCode, number, depart - Price. Также копируем цены
-        Map<Price.Index, List<Price>> curPricesMap = new HashMap<>();
-        Price.Index curIndex;
-        for (Price curPrice : curPrices) {
-            curIndex = curPrice.getIndex();
-            if (!curPricesMap.containsKey(curIndex)) {
-                curPricesMap.put(curIndex, new LinkedList<>(Collections.singletonList(new Price(curPrice))));
-            } else {
-                curPricesMap.get(curIndex).add(new Price(curPrice));
-            }
-        }
-
-        Map<Price.Index, List<Price>> newPricesMap = new HashMap<>();
-        for (Price newPrice : newPrices) {
-            curIndex = newPrice.getIndex();
-            if (!newPricesMap.containsKey(curIndex)) {
-                newPricesMap.put(curIndex, new LinkedList<>(Collections.singletonList(new Price(newPrice))));
-            } else {
-                newPricesMap.get(curIndex).add(new Price(newPrice));
-            }
-        }
-
-        return unionMapPrices(curPricesMap, newPricesMap);
+    private PriceHelper() { // У статического хелпера не может быть экземпляров
     }
 
-    private static Collection<Price> unionMapPrices(Map<Price.Index, List<Price>> curPricesMap, Map<Price.Index, List<Price>> newPricesMap) {
+    /**
+     * Объединение цен по заявленным правилам.
+     */
+    public static Collection<Price> unionPrices(Collection<Price> curPrices, Collection<Price> newPrices) {
+        return unionPrices(getIndexListMap(curPrices), getIndexListMap(newPrices));
+    }
+
+    /**
+     * Возвращает карту со списками цен (копиями объектов) с одинаковыми <productCode, number, depart> = Index
+     */
+    private static Map<Price.Index, List<Price>> getIndexListMap(Collection<Price> prices) {
+
+        Price.Index curIndex;
+        Map<Price.Index, List<Price>> result = new HashMap<>();
+        for (Price curPrice : prices) {
+            curIndex = curPrice.getIndex();
+            if (!result.containsKey(curIndex)) {
+                result.put(curIndex, new LinkedList<>(Collections.singletonList(new Price(curPrice))));
+            } else {
+                result.get(curIndex).add(new Price(curPrice));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Объединение цен в картах
+     */
+    private static Collection<Price> unionPrices(Map<Price.Index, List<Price>> curPricesMap, Map<Price.Index, List<Price>> newPricesMap) {
 
         Collection<Price> result = new LinkedList<>();
 
@@ -58,15 +63,15 @@ public class PriceHelper {
         return result;
     }
 
+    /**
+     * Объединяет цены с одинаковыми индексами  (productCode, number, depart)
+     */
     private static Collection<Price> unionPricesWithSameIndex(Collection<Price> curPrices, Collection<Price> newPrices) {
 
-        // хранит цены с новыми интервалами
-        Collection<Price> newPriceLevel = new LinkedList<>();
+        Collection<Price> newPriceLevel = new LinkedList<>(); // хранит цены с новыми интервалами
         Collection<Price> currentPriceLevel = curPrices;
 
         for (Price newPrice : newPrices) {
-
-            newPriceLevel.clear();
 
             for (Price curPrice : currentPriceLevel) {
 
@@ -127,6 +132,7 @@ public class PriceHelper {
             currentPriceLevel.clear();
             currentPriceLevel.addAll(newPriceLevel);
             currentPriceLevel.add(newPrice);
+            newPriceLevel.clear();
         }
         return currentPriceLevel;
     }
@@ -138,58 +144,4 @@ public class PriceHelper {
         return !(curPrice.getBegin().after(newPrice.getEnd()) || curPrice.getEnd().before(newPrice.getBegin()));
     }
 
-//    /**
-//     * Пересечение цен по временным интервалам.
-//     * newPrice может изменяться
-//     * @param curPrice
-//     * @param newPrice
-//     * @return
-//     */
-//    private static Collection<Price> crossPrices(Price curPrice, Price newPrice) {
-//
-//        Collection<Price> result = new LinkedList<>();
-//
-//
-//
-//
-//        // интервалы не пересекаются
-//        if (!isCrossing(curPrice, newPrice)) {
-//            result.add(curPrice);
-//            return result;
-//        }
-//
-//        // случай (  [ )  ] , где () - временной интервал старой цены, [] - временной интервал новой цены
-//        if (curPrice.getBegin().before(newPrice.getBegin()) && curPrice.getEnd().before(newPrice.getEnd())) {
-//            curPrice.setEnd(newPrice.getBegin());
-//            result.add(curPrice);
-//            return result;
-//        }
-//
-//        // случай [  ( ]  ) , где () - временной интервал старой цены, [] - временной интервал новой цены
-//        if (curPrice.getBegin().after(newPrice.getBegin()) && curPrice.getEnd().after(newPrice.getBegin())) {
-//            curPrice.setBegin(newPrice.getEnd());
-//            result.add(curPrice);
-//            return result;
-//        }
-//
-//        // случай ( [ ] ) , где () - временной интервал старой цены, [] - временной интервал новой цены
-//        if (curPrice.getBegin().before(newPrice.getBegin()) && curPrice.getEnd().after(newPrice.getEnd())) {
-//            Price thirdPrice = new Price(); // Цена для третьего интервала
-//            thirdPrice.setBegin(newPrice.getEnd());
-//            thirdPrice.setEnd(curPrice.getEnd());
-//            thirdPrice.setDepart(curPrice.getDepart());
-//            thirdPrice.setNumber(curPrice.getNumber());
-//            thirdPrice.setProductCode(curPrice.getProductCode());
-//            thirdPrice.setValue(curPrice.getValue());
-//            thirdPrice.setId(new Random().nextLong()); // Новый индекс. В задании ничего не сказано про него. Поэтому так)
-//
-//            curPrice.setEnd(newPrice.getBegin());
-//            result.add(curPrice);
-//            result.add(thirdPrice);
-//            return result;
-//        }
-//
-//        // остался случай [ () ] , где () - временной интервал старой цены, [] - временной интервал новой цены
-//        return result; // пустой список
-//    }
 }
